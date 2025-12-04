@@ -16,3 +16,30 @@ Redirect the user away from the page if not authenticated, or show an appropriat
 2. For users, they should have a database that keeps track of their stored trips and also enables them to search for flights. They can route based off different buttons. In the search flights, we can route to a page that allows people to search for flights based off different information
 
 3. For stored flights, it should go to a database of these stored vacations 
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   - Copy `.env.example` to `.env`
+   - Fill in your Firebase configuration values:
+   ```bash
+   cp .env.example .env
+   ```
+   - Edit `.env` with your Firebase credentials:
+   ```
+   REACT_APP_FIREBASE_API_KEY=your_api_key
+   REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
+   REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+   REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   REACT_APP_FIREBASE_APP_ID=your_app_id
+   REACT_APP_FIREBASE_MEASUREMENT_ID=your_measurement_id
+   ```
+
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
