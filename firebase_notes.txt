@@ -1,0 +1,30 @@
+"private_key_id": "15d14778710bf2317d3cca187543aed594288c70",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCMGwEPWHlx3UI3\nYnbl8Rf8mAYo6I7T0k0IT/02BKym6ZdNcJiB57yVgxXoiAAf82kvqkIBRIUjH1en\n4zPXz/MtPestbFU1L69B3YIP8bAhwbl1OgJDNyP7BJWAsw6a0tXJW1DcopjVA1BZ\nmxPsJdzt/DShPOFIEUlwswOn1euUOc4Z9VMDCH2KUNd1qKjGreQyY+Hqsl+MAU48\nw3sxdbkOHPTpTwYG4tUakhdtuB1RZUOzlXZAufhpMAg7IWaAWprOLj1/TxbwBwZC\nFVp/s62RkgExy9AzFDul6n9NdSmPaKd9tWXJ8ei4M2hNIPAOtPfLwkj36F+BXQ2g\nyMpRtsPJAgMBAAECggEABGv0bEaPi/oT/+l59ScsaaARTwiKkWwpWuIjYf64cDVz\nvVGYuT4rY9CU8sIatuduDL9j1o8SC0S5oHvO2WMfuprMqaH/TRlp1OX9F9cPMabf\n3S+X01qR0SHuPKHqC8AsV8QrriWXizQlPLQPPJG0AkgbunGlw9TVK4W1eijfMXis\nRUsvQG4oPxDK9LAoP2hGbjiOmcrRT6TQjYGFjK+LQDpddaCcLH8aN8GzH69//XT4\ny1//jMVUG5CT3iGqbVAOy44NkFvXjSwoxKcdK13N2XGcJ7A893gdQCTBm+rtSs+X\nhEXKXIsEMIldNkfdkZy1famHOz6wJCm5+U6avLTP7QKBgQDBPs8MoDKVAF2MKBrF\n86qElSOEvUEo75jV/JpOe9BtKBhiPhYmBYO5LeYelqK3fwhTF+cAanUjjYMdV+Xg\nMHW0N74bJQTKlH4auZKaYIdMbbuYE0NkwjUbNbfhBNGdBrKi8UOoUp22FEU7momc\ngcz3/LPBlSDDgyi1zo+C3O64TwKBgQC5mnwQONOYwuvoD7y4gdZMssoFAlv+kWsL\naoXKNAu0Tpxa4+aXgOd1LlJq82QoBiU2NQSyY8Ec3WfsaKyfpYZoovUsaOLgweNc\n476i71GGfPp6SVmtSDkvLSd33132rfsAEYBj8DTgI+x5ES8WoxwC+x3uTxwuBSbq\n5f8vCOikZwKBgCg7N0fdoio7JT6kqs5DaGCp2/cqn4IyP5NtP4LPbBkNm+X4HwxT\nYZUP5TTBD6c8HzONal4/y5tXPtDBF+6QqDCY2k80acbzGz3dHJRfPEvBHKkQeZtk\ng0Hi8SE7q5gRaOdba0aDzKm3lqJODhAzRcTrK1FGBsgtajBPjLkl3d0pAoGBAIMa\niaoXyfetMGBCxYb7R7nzzNnO+daPN7LfstPLAb2CjdVyCE9aYaSXbOZZOJVBCgYJ\nW2D7L8zI5IDMy6sVjCTbfx24lRI4Qvc5dE65h7fdDj1VFMBfNO2LEscNA92ctaEt\nu6hcY600EvTN25o86yt74H+WaAxl3UCt6Bx8SYDfAoGAHfbpzrKPztTcEpHYu51B\nGwycs/wLhzjj+Bg01tmZ8hCFCkmFfHnXzSO2WFpTiP1hXLf7DS+Tcfhm9EsjDNJm\nGVQJz4rYj3vCM7b8YQYObjo92XkQVX2jGqHSIsbuGsKG437xhHUPVG+HnvTeZisi\nOAT+KCpjvIlDIY673W+DzRE=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@cs409finalproject-9c881.iam.gserviceaccount.com",
+
+
+have to use npm install firebase (for frontend)
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCbMwykqYME80QGtkp_wLjDYICPZOtpgp8",
+  authDomain: "cs409finalproject-9c881.firebaseapp.com",
+  projectId: "cs409finalproject-9c881",
+  storageBucket: "cs409finalproject-9c881.firebasestorage.app",
+  messagingSenderId: "3176419338",
+  appId: "1:3176419338:web:1d1483cf30859a1f564ff3",
+  measurementId: "G-0Y7E5LKZ98"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+
