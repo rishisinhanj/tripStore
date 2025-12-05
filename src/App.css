@@ -116,18 +116,23 @@ body {
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: #667eea;
+  color: white;
+  border: 1px solid #667eea;
   padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(102, 126, 234, 0.2);
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: #5a67d8;
+  border-color: #5a67d8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
 }
 
 .error-alert {
@@ -1020,15 +1025,50 @@ body {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.add-to-vacation-btn {
+  background: #667eea !important;
+  color: white !important;
+  border: 1px solid #667eea !important;
+  font-weight: 600 !important;
+  min-width: 120px;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.add-to-vacation-btn:hover {
+  background: #5a67d8 !important;
+  border-color: #5a67d8 !important;
 }
 
 .add-to-vacation {
   position: relative;
+  flex-shrink: 0;
+}
+
+/* Add overlay for mobile dropdown */
+@media (max-width: 768px) {
+  .add-to-vacation.show-dropdown::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    pointer-events: auto;
+  }
 }
 
 .vacation-dropdown {
@@ -1039,10 +1079,183 @@ body {
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 250px;
+  min-width: 280px;
+  max-width: 320px;
   z-index: 1000;
   padding: 15px;
   margin-top: 5px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* If dropdown would go off right edge, align it to the left */
+.vacation-dropdown {
+  transform: translateX(0);
+}
+
+/* Check if we need to move left to stay in viewport */
+@supports (inset-inline-end: 0) {
+  .vacation-dropdown {
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+  }
+}
+
+/* For mobile screens, center the dropdown */
+@media (max-width: 768px) {
+  .vacation-dropdown {
+    position: fixed;
+    top: 20%;
+    left: 10px;
+    right: 10px;
+    bottom: auto;
+    transform: none;
+    min-width: auto;
+    max-width: none;
+    max-height: 60vh;
+    margin: 0;
+    z-index: 1050;
+  }
+}
+
+/* Add to Vacation Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-header {
+  padding: 20px 20px 15px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #374151;
+  font-size: 1.25rem;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.flight-info {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.flight-info h4 {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.flight-info p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.vacation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vacation-option-btn {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.vacation-option-btn:hover {
+  border-color: #667eea;
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.vacation-info strong {
+  color: #374151;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.vacation-dates {
+  color: #667eea;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.vacation-destination {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.modal-footer {
+  padding: 15px 20px 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    margin: 10px;
+    max-width: none;
+  }
+  
+  .modal-overlay {
+    padding: 10px;
+  }
 }
 
 .vacation-dropdown h4 {

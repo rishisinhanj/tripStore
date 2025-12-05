@@ -10,6 +10,8 @@ export default function StoredTrips() {
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'flights', 'vacations'
+  const [showAddToVacationModal, setShowAddToVacationModal] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState(null);
   const { currentUser } = useAuth();
 
   const loadTrips = useCallback(async () => {
@@ -89,6 +91,30 @@ export default function StoredTrips() {
       } catch (error) {
         setError('Failed to delete trip: ' + error.message);
       }
+    }
+  };
+
+  // Modal handlers for adding flight to vacation
+  const handleOpenAddToVacationModal = (flight) => {
+    setSelectedFlight(flight);
+    setShowAddToVacationModal(true);
+  };
+
+  const handleCloseAddToVacationModal = () => {
+    setShowAddToVacationModal(false);
+    setSelectedFlight(null);
+  };
+
+  const handleAddToVacation = async (vacationId) => {
+    try {
+      if (selectedFlight && selectedFlight.type === 'flight') {
+        await tripService.addFlightToVacation(vacationId, selectedFlight.flight);
+        alert('Flight added to vacation successfully!');
+        handleCloseAddToVacationModal();
+        await loadTrips(); // Refresh the data
+      }
+    } catch (error) {
+      alert('Failed to add flight to vacation: ' + error.message);
     }
   };
 
@@ -192,8 +218,60 @@ export default function StoredTrips() {
               onDelete={() => deleteTrip(trip.id)}
               vacations={vacations}
               onTripUpdated={loadTrips}
+              onOpenAddToVacationModal={handleOpenAddToVacationModal}
             />
           ))}
+        </div>
+      )}
+
+      {/* Add to Vacation Modal */}
+      {showAddToVacationModal && selectedFlight && (
+        <div className="modal-overlay" onClick={handleCloseAddToVacationModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Add Flight to Vacation</h3>
+              <button 
+                className="modal-close-btn" 
+                onClick={handleCloseAddToVacationModal}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="flight-info">
+                <h4>Flight: {selectedFlight.tripName}</h4>
+                <p>Select a vacation to add this flight to:</p>
+              </div>
+              
+              <div className="vacation-list">
+                {vacations.map(vacation => (
+                  <button
+                    key={vacation.id}
+                    onClick={() => handleAddToVacation(vacation.id)}
+                    className="vacation-option-btn"
+                  >
+                    <div className="vacation-info">
+                      <strong>{vacation.tripName}</strong>
+                      <div className="vacation-dates">
+                        {new Date(vacation.startDate).toLocaleDateString()} - {new Date(vacation.endDate).toLocaleDateString()}
+                      </div>
+                      <div className="vacation-destination">{vacation.destination}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                onClick={handleCloseAddToVacationModal}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -246,25 +324,11 @@ function EmptyState({ activeTab }) {
 }
 
 // Trip Card Component
-function TripCard({ trip, onDelete, vacations, onTripUpdated }) {
-  const [showFlightOptions, setShowFlightOptions] = useState(false);
+function TripCard({ trip, onDelete, vacations, onTripUpdated, onOpenAddToVacationModal }) {
 
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return date instanceof Date ? date.toLocaleDateString() : new Date(date).toLocaleDateString();
-  };
-
-  const handleAddToVacation = async (vacationId) => {
-    try {
-      if (trip.type === 'flight') {
-        await tripService.addFlightToVacation(vacationId, trip.flight);
-        alert('Flight added to vacation!');
-        setShowFlightOptions(false);
-        onTripUpdated();
-      }
-    } catch (error) {
-      alert('Failed to add flight to vacation: ' + error.message);
-    }
   };
 
   return (
@@ -297,38 +361,19 @@ function TripCard({ trip, onDelete, vacations, onTripUpdated }) {
         
         <div className="action-buttons">
           {trip.type === 'flight' && vacations.length > 0 && (
-            <div className="add-to-vacation">
-              <button 
-                onClick={() => setShowFlightOptions(!showFlightOptions)}
-                className="btn-secondary btn-sm"
-              >
-                Add to Vacation
-              </button>
-              
-              {showFlightOptions && (
-                <div className="vacation-dropdown">
-                  <h4>Add to which vacation?</h4>
-                  {vacations.map(vacation => (
-                    <button
-                      key={vacation.id}
-                      onClick={() => handleAddToVacation(vacation.id)}
-                      className="vacation-option"
-                    >
-                      {vacation.tripName}
-                      <span className="vacation-dates">
-                        {formatDate(vacation.startDate)} - {formatDate(vacation.endDate)}
-                      </span>
-                    </button>
-                  ))}
-                  <button 
-                    onClick={() => setShowFlightOptions(false)}
-                    className="btn-cancel"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
+            <button 
+              onClick={() => onOpenAddToVacationModal(trip)}
+              className="btn-secondary btn-sm add-to-vacation-btn"
+            >
+              Add to Vacation
+            </button>
+          )}
+          
+          {/* Show helpful message if conditions aren't met */}
+          {trip.type === 'flight' && vacations.length === 0 && (
+            <span className="no-vacations-hint" style={{fontSize: '0.8rem', color: '#666', fontStyle: 'italic'}}>
+              Create a vacation first to add flights
+            </span>
           )}
           
           <button onClick={onDelete} className="btn-danger btn-sm">
