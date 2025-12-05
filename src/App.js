@@ -5,6 +5,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
+import FlightSearch from './components/FlightSearch';
 import './App.css';
 
 function App() {
@@ -20,6 +21,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/search-flights" 
+              element={
+                <PrivateRoute>
+                  <FlightSearch />
                 </PrivateRoute>
               } 
             />
