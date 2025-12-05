@@ -40,7 +40,7 @@ export default function Dashboard() {
           <div className="dashboard-card">
             <h3>Stored Trips</h3>
             <p>View and manage your saved trips</p>
-            <button className="btn-primary">View Trips</button>
+            <Link to="/stored-trips" className="btn-primary">View Trips</Link>
           </div>
 
           <div className="dashboard-card">

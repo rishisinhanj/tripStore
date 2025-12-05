@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import FlightSearch from './components/FlightSearch';
+import StoredTrips from './components/StoredTrips';
 import './App.css';
 
 function App() {
@@ -29,6 +30,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <FlightSearch />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/stored-trips" 
+              element={
+                <PrivateRoute>
+                  <StoredTrips />
                 </PrivateRoute>
               } 
             />
