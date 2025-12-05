@@ -145,6 +145,34 @@ body {
   margin-bottom: 1rem;
 }
 
+.success-alert {
+  background: #ecfdf5;
+  color: #065f46;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background: #e5e7eb;
+  margin: 1rem 0;
+}
+
+.form-group input.readonly-input,
+.form-group input.readonly-input:disabled,
+.form-group input[disabled].readonly-input {
+  background: #e5e7eb; /* darker grey for disabled email */
+  color: #6b7280;
+}
+
+.form-group input.readonly-input:hover,
+.form-group input.readonly-input:disabled:hover,
+.form-group input[disabled].readonly-input:hover {
+  cursor: not-allowed; /* blocked symbol on hover */
+}
+
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;
