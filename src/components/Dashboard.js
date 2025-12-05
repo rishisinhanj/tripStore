@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
@@ -32,7 +32,9 @@ export default function Dashboard() {
           <div className="dashboard-card">
             <h3>Search Flights</h3>
             <p>Find and book your next trip</p>
-            <button className="btn-primary">Search Flights</button>
+            <Link to="/search-flights" className="btn-primary">
+              Search Flights
+            </Link>
           </div>
 
           <div className="dashboard-card">
