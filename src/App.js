@@ -39,6 +39,10 @@ function App() {
               element={
                 <PrivateRoute>
                   <Profile />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
               path="/stored-trips" 
               element={
                 <PrivateRoute>
