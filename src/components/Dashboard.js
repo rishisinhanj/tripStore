@@ -46,7 +46,7 @@ export default function Dashboard() {
           <div className="dashboard-card">
             <h3>Profile Settings</h3>
             <p>Update your account information</p>
-            <button className="btn-primary">Edit Profile</button>
+            <Link to="/profile" className="btn-primary">Edit Profile</Link>
           </div>
         </div>
       </div>

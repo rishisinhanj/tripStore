@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import FlightSearch from './components/FlightSearch';
+import Profile from './components/Profile';
 import './App.css';
 
 function App() {
@@ -29,6 +30,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <FlightSearch />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <PrivateRoute>
+                  <Profile />
                 </PrivateRoute>
               } 
             />
