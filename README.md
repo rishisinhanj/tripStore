@@ -15,7 +15,14 @@ Redirect the user away from the page if not authenticated, or show an appropriat
 
 2. For users, they should have a database that keeps track of their stored trips and also enables them to search for flights. They can route based off different buttons. In the search flights, we can route to a page that allows people to search for flights based off different information
 
-3. For stored flights, it should go to a database of these stored vacations 
+3. For stored flights, it should go to a database of these stored vacations
+
+when users click the button on the dashboard for stored flights, they have the option to add it to their flight stored database with a dropdown of all the flights 
+
+From the dashboard, when they click the stored vacations, it shows the trips organized in chronological order with their price displayed as well. When you click on a vacation, it shows each flight that has been added there. 
+
+for the airport, stick to using iata codes
+
 
 2. **Install dependencies**
    ```bash
