@@ -6,6 +6,18 @@ class AmadeusAPI {
     this.baseUrl = process.env.REACT_APP_AMADEUS_BASE_URL;
     this.accessToken = null;
     this.tokenExpiry = null;
+
+    // Check if environment variables are loaded
+    if (!this.apiKey || !this.apiSecret || !this.baseUrl) {
+      console.error('Missing Amadeus API credentials:', {
+        hasApiKey: !!this.apiKey,
+        hasApiSecret: !!this.apiSecret,
+        hasBaseUrl: !!this.baseUrl
+      });
+      throw new Error('Amadeus API credentials not found. Please check your .env file.');
+    }
+
+    console.log('Amadeus API initialized with base URL:', this.baseUrl);
   }
 
   // Get OAuth access token from Amadeus
@@ -57,6 +69,8 @@ class AmadeusAPI {
       }
     });
 
+    console.log('Making API request to:', url.toString());
+
     try {
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -67,8 +81,23 @@ class AmadeusAPI {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`API Error: ${errorData.error_description || response.statusText}`);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          console.error('Parsed error data:', errorData);
+          
+          // Handle Amadeus-specific error format
+          if (errorData.errors && errorData.errors.length > 0) {
+            const firstError = errorData.errors[0];
+            throw new Error(`API Error: ${firstError.detail || firstError.title || response.statusText}`);
+          }
+          
+          throw new Error(`API Error: ${errorData.error_description || errorData.detail || response.statusText}`);
+        } catch (parseError) {
+          throw new Error(`API Error: ${response.status} - ${errorText || response.statusText}`);
+        }
       }
 
       return await response.json();
@@ -78,43 +107,65 @@ class AmadeusAPI {
     }
   }
 
-  // Convert city/airport input to IATA code
+  // Convert airport input to IATA code
   async getIATACode(location) {
-    try {
-      // First try to get airport/city information
-      const data = await this.makeAPIRequest('/v1/reference-data/locations', {
-        keyword: location,
-        'subType': 'AIRPORT,CITY'
-      });
+    // Clean up the input
+    const cleanLocation = location.trim().toUpperCase();
 
-      if (data.data && data.data.length > 0) {
-        // Return the first match's IATA code
-        return data.data[0].iataCode;
-      } else {
-        // If no results, assume it's already an IATA code
-        return location.toUpperCase();
-      }
-    } catch (error) {
-      console.warn('Could not resolve IATA code for:', location);
-      // Fallback: assume it's already an IATA code
-      return location.toUpperCase();
+    // Check if it's already a valid 3-letter IATA code
+    if (cleanLocation.length === 3 && /^[A-Z]{3}$/.test(cleanLocation)) {
+      console.log(`Using IATA code: ${cleanLocation}`);
+      return cleanLocation;
     }
+
+    // If not a 3-letter code, throw a helpful error
+    throw new Error(`Please enter a valid 3-letter airport code (e.g., EWR, NRT, LAX). "${location}" is not a valid IATA code.`);
   }
 
   // Search flight offers
   async searchFlightOffers({ from, to, departDate, returnDate, passengers = 1, maxResults = 10 }) {
     try {
+      // Validate required parameters
+      if (!from || !to || !departDate) {
+        throw new Error('From, To, and Departure Date are required');
+      }
+
+      // Validate date format (should be YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(departDate)) {
+        throw new Error('Departure date must be in YYYY-MM-DD format');
+      }
+
+      if (returnDate && !dateRegex.test(returnDate)) {
+        throw new Error('Return date must be in YYYY-MM-DD format');
+      }
+
+      // Check if dates are in the future
+      const today = new Date().toISOString().split('T')[0];
+      if (departDate < today) {
+        throw new Error('Departure date must be in the future');
+      }
+
+      if (returnDate && returnDate <= departDate) {
+        throw new Error('Return date must be after departure date');
+      }
+
+      console.log('Searching flights with original params:', { from, to, departDate, returnDate, passengers });
+
       // Convert locations to IATA codes
       const originCode = await this.getIATACode(from);
       const destinationCode = await this.getIATACode(to);
+
+      console.log('Converted IATA codes:', { origin: originCode, destination: destinationCode });
 
       // Build search parameters
       const searchParams = {
         originLocationCode: originCode,
         destinationLocationCode: destinationCode,
         departureDate: departDate,
-        adults: passengers,
-        max: Math.min(maxResults, 250), // Amadeus limit
+        adults: passengers.toString(),
+        max: Math.min(maxResults, 100).toString(), // Reduced from 250 to be safer
+        currencyCode: 'USD'
       };
 
       // Add return date if provided
@@ -122,7 +173,7 @@ class AmadeusAPI {
         searchParams.returnDate = returnDate;
       }
 
-      console.log('Searching flights with params:', searchParams);
+      console.log('Final API search params:', searchParams);
 
       // Make the flight offers search request
       const data = await this.makeAPIRequest('/v2/shopping/flight-offers', searchParams);

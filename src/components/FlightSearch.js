@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { flightSearchService } from '../services/flightSearch';
+import { amadeusAPI } from '../services/amadeusAPI';
+import { tripService } from '../services/tripService';
 import { Link } from 'react-router-dom';
 
 export default function FlightSearch() {
@@ -15,7 +16,8 @@ export default function FlightSearch() {
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [lastSearchParams, setLastSearchParams] = useState(null); // Track the params used for current results
+  const [lastSearchParams, setLastSearchParams] = useState(null);
+  const [savedFlights, setSavedFlights] = useState(new Set()); // Track saved flights
   const { currentUser } = useAuth();
 
   const handleInputChange = (field, value) => {
@@ -32,7 +34,7 @@ export default function FlightSearch() {
       setLoading(true);
       setError('');
       
-      const results = await flightSearchService.searchFlights(searchParams);
+      const results = await amadeusAPI.searchFlightOffers(searchParams);
       setSearchResults(results);
       setLastSearchParams(searchParams); // Store the search params that generated these results
       
@@ -56,6 +58,39 @@ export default function FlightSearch() {
     return flight.price * searchParams.passengers;
   };
 
+  const saveFlight = async (flight, type = 'outbound') => {
+    if (!currentUser) {
+      alert('Please log in to save flights');
+      return;
+    }
+
+    try {
+      const flightId = `${type}-${flight.id}`;
+      
+      if (savedFlights.has(flightId)) {
+        alert('Flight already saved!');
+        return;
+      }
+
+      console.log('Saving flight:', { flight, searchParams: lastSearchParams });
+
+      // Create a simplified flight object with search context
+      const flightToSave = {
+        ...flight,
+        searchType: type
+      };
+
+      await tripService.saveFlight(currentUser.uid, flightToSave, lastSearchParams);
+      
+      setSavedFlights(prev => new Set([...prev, flightId]));
+      alert('Flight saved successfully!');
+      
+    } catch (error) {
+      console.error('Error saving flight:', error);
+      alert('Failed to save flight: ' + error.message);
+    }
+  };
+
   return (
     <div className="flight-search-container">
       <div className="flight-search-header">
@@ -63,6 +98,9 @@ export default function FlightSearch() {
           <Link to="/dashboard" className="back-link">← Back to Dashboard</Link>
           <h1>Search Flights</h1>
           <p>Find the perfect flight for your next adventure</p>
+          <div className="airport-code-help">
+            <p><strong>Use 3-letter airport codes:</strong> EWR (Newark), JFK (JFK), LAX (Los Angeles), NRT (Tokyo), LHR (London), etc.</p>
+          </div>
         </div>
       </div>
 
@@ -73,30 +111,32 @@ export default function FlightSearch() {
         <form onSubmit={handleSearch} className="flight-search-form">
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="from">From</label>
+              <label htmlFor="from">From (Airport Code)</label>
               <input
                 type="text"
                 id="from"
                 value={searchParams.from}
                 onChange={(e) => handleInputChange('from', e.target.value)}
-                placeholder="e.g., New York, JFK, London"
+                placeholder="e.g., EWR, JFK, LAX"
                 autoComplete="off"
                 required
                 disabled={loading}
+                maxLength="3"
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="to">To</label>
+              <label htmlFor="to">To (Airport Code)</label>
               <input
                 type="text"
                 id="to"
                 value={searchParams.to}
                 onChange={(e) => handleInputChange('to', e.target.value)}
-                placeholder="e.g., Chicago, Miami, Tokyo"
+                placeholder="e.g., NRT, LHR, CDG"
                 autoComplete="off"
                 required
                 disabled={loading}
+                maxLength="3"
               />
             </div>
           </div>
@@ -207,7 +247,16 @@ export default function FlightSearch() {
                           Total: ${getTotalPrice(flight)}
                         </span>
                       </div>
-                      <span className="flight-class">{flight.class}</span>
+                      <div className="flight-actions">
+                        <span className="flight-class">{flight.class}</span>
+                        <button 
+                          onClick={() => saveFlight(flight, 'outbound')}
+                          disabled={savedFlights.has(`outbound-${flight.id}`)}
+                          className={`btn-secondary btn-sm ${savedFlights.has(`outbound-${flight.id}`) ? 'saved' : ''}`}
+                        >
+                          {savedFlights.has(`outbound-${flight.id}`) ? '✓ Saved' : 'Save Flight'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -255,7 +304,16 @@ export default function FlightSearch() {
                           Total: ${getTotalPrice(flight)}
                         </span>
                       </div>
-                      <span className="flight-class">{flight.class}</span>
+                      <div className="flight-actions">
+                        <span className="flight-class">{flight.class}</span>
+                        <button 
+                          onClick={() => saveFlight(flight, 'return')}
+                          disabled={savedFlights.has(`return-${flight.id}`)}
+                          className={`btn-secondary btn-sm ${savedFlights.has(`return-${flight.id}`) ? 'saved' : ''}`}
+                        >
+                          {savedFlights.has(`return-${flight.id}`) ? '✓ Saved' : 'Save Flight'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
