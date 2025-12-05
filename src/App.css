@@ -269,7 +269,7 @@ body {
 }
 
 .back-link {
-  color: #667eea;
+  color: white !important;
   text-decoration: none;
   font-size: 1rem;
   margin-bottom: 1rem;
@@ -280,15 +280,20 @@ body {
   padding: 8px 16px;
   border: 1px solid #667eea;
   border-radius: 6px;
-  background: #f8f9ff;
+  background: #667eea !important;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  width: auto;
+  max-width: fit-content;
+  white-space: nowrap;
 }
 
 .back-link:hover {
-  background: #667eea;
-  color: white;
+  background: #5a67d8 !important;
+  color: white !important;
   text-decoration: none;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
 }
 
 .flight-search-header h1 {
@@ -745,7 +750,7 @@ body {
 }
 
 .back-link {
-  color: rgba(255, 255, 255, 0.9);
+  color: white;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -753,15 +758,20 @@ body {
   align-items: center;
   gap: 5px;
   padding: 8px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #667eea;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #667eea;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  width: auto;
+  max-width: fit-content;
+  white-space: nowrap;
 }
 
 .back-link:hover {
   color: white;
-  background: rgba(255, 255, 255, 0.2);
+  background: #5a67d8;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
 }
 
 .trips-controls {
