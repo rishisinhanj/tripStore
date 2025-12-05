@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { flightSearchService } from '../services/flightSearch';
+import { amadeusAPI } from '../services/amadeusAPI';
 import { Link } from 'react-router-dom';
 
 export default function FlightSearch() {
@@ -32,7 +32,7 @@ export default function FlightSearch() {
       setLoading(true);
       setError('');
       
-      const results = await flightSearchService.searchFlights(searchParams);
+      const results = await amadeusAPI.searchFlightOffers(searchParams);
       setSearchResults(results);
       setLastSearchParams(searchParams); // Store the search params that generated these results
       
