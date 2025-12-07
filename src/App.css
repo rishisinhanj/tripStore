@@ -287,7 +287,7 @@ body {
 /* Flight Search Styles */
 .flight-search-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .flight-search-header {
