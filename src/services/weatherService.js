@@ -1,3 +1,5 @@
+import amadeusAPI from './amadeusAPI';
+
 const API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
@@ -20,31 +22,22 @@ async function fetchJson(url) {
   return res.json();
 }
 
-function normalizeCityName(rawName) {
+async function normalizeCityName(rawName) {
   if (!rawName) return rawName;
 
   const trimmed = rawName.trim();
-  const upper = trimmed.toUpperCase();
 
-  const map = {
-    NYC: 'New York, US',
-    JFK: 'New York, US',
-    LGA: 'New York, US',
-    EWR: 'Newark, US',
-
-    CHI: 'Chicago, US',
-    LAX: 'Los Angeles, US',
-    SFO: 'San Francisco, US',
-    LON: 'London, GB',
-    PAR: 'Paris, FR',
-    TYO: 'Tokyo, JP',
-  };
-
-  if (map[upper]) {
-    return map[upper];
+  if (!/^[A-Za-z]{3}$/.test(trimmed)) {
+    return trimmed;
   }
 
-  return trimmed;
+  try {
+    const resolved = await amadeusAPI.resolveCityName(trimmed);
+    return resolved || trimmed;
+  } catch (error) {
+    console.error('Failed to resolve city name for weather:', error);
+    return trimmed;
+  }
 }
 
 async function getCityForecast(cityName) {
@@ -59,7 +52,7 @@ async function getCityForecast(cityName) {
     );
   }
 
-  const normalizedName = normalizeCityName(cityName);
+  const normalizedName = await normalizeCityName(cityName);
   console.log('Weather lookup city =', normalizedName);
 
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(
@@ -67,7 +60,6 @@ async function getCityForecast(cityName) {
   )}&units=${UNITS}&appid=${API_KEY}`;
 
   const data = await fetchJson(url);
-
   const daysMap = {};
 
   data.list.forEach((entry) => {

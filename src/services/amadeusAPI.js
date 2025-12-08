@@ -426,6 +426,38 @@ class AmadeusAPI {
       return [];
     }
   }
+
+  // Resolve a 3-letter city/airport code
+  async resolveCityName(cityCode) {
+    if (!cityCode) return null;
+
+    const clean = cityCode.trim().toUpperCase();
+
+    // If it's not a simple 3-letter code, just return it unchanged
+    if (!/^[A-Z]{3}$/.test(clean)) {
+      return cityCode;
+    }
+
+    try {
+      // Use the generic locations endpoint to find a city by this code
+      const data = await this.makeAPIRequest('/v1/reference-data/locations', {
+        subType: 'CITY',
+        keyword: clean,
+        'page[limit]': 1,
+      });
+
+      const loc = data?.data?.[0];
+      if (!loc) return cityCode;
+
+      const name = loc.name || cityCode;
+      const country = loc.address?.countryCode || '';
+
+      return country ? `${name}, ${country}` : name;
+    } catch (error) {
+      console.error('Failed to resolve city name from Amadeus:', error);
+      return cityCode;
+    }
+  }
 }
 
 // Export singleton instance
