@@ -1,27 +1,37 @@
 ## TRIPSTORE 
 
-1. Create a react based app that can manage users flights 
+Searching for flights on the internet is easy, but
+being able to store flights of interest and manage distinct trips is still a need we have not found
+a solution for. To that end, we propose our app TripStore. This solution will allow individuals to
+keep tabs on distinct vacations they could be interested in, search for existing flights and get information on their upcoming destinations.
 
-In the first page, have a login page with either firebase. The name should be tripStore. We can have a login and signup page 
-
-* If there are too many requests, send a 429 rate limiting code 
-* Authentication should always be performed on the client side before content on the page is
-loaded/lazy loading the content or before making an API call. Cases include:
-● A token is not available in the session or local storage, or the authentication provider fails.
-● An API has returned a 401 or 403 status code.
-Avoid making the API call if you already know that the user is not authenticated/authorized.
-Redirect the user away from the page if not authenticated, or show an appropriate message.
+#### Login
 
 
-2. For users, they should have a database that keeps track of their stored trips and also enables them to search for flights. They can route based off different buttons. In the search flights, we can route to a page that allows people to search for flights based off different information
+Users can either login or signup for a new account to get access for our service. When they login, there will be a dashboard with the options to search for new flights or look at saved trips. 
 
-3. For stored flights, it should go to a database of these stored vacations
+#### 1. Searching for flights 
 
-when users click the button on the dashboard for stored flights, they have the option to add it to their flight stored database with a dropdown of all the flights 
+Users have to type the 3 letter IATA code for the origin airport and the destination airport. For a one-way flight, a return destination does not have to be specified. Otherwise, both the origin and return should be filled. We then make a call using the Amadeus Travel API to return up-to-date flights that fulfill the criteria. Users can save these flights to eventually add them to a trip. If it is a round trip, *users must add both the outbound and return flight*. 
 
-From the dashboard, when they click the stored vacations, it shows the trips organized in chronological order with their price displayed as well. When you click on a vacation, it shows each flight that has been added there. 
+#### 2. Saved trips 
 
-for the airport, stick to using iata codes
+Users can access their saved trips to look at saved flights as well as saved vacations. Anytime a user adds a flight from our search feature, it shows up in the saved flights. Users can add descriptions and features about their vacation and then add these flights to their saved vacation. If a flight is within 5 days, users can also get weather information that we make by calling a local API. Users can see the total flight costs that have been added to a vacation.
+
+
+#### 3. Changing Profile Details
+
+A user can also change their password by clicking the changing profile details to change their password.
+
+
+
+## Steps for local installation 
+
+1. Clone repository 
+
+    ```bash
+    git clone https://github.com/rishisinhanj/tripStore.git
+    ```
 
 
 2. **Install dependencies**
@@ -35,7 +45,7 @@ for the airport, stick to using iata codes
    ```bash
    cp .env.example .env
    ```
-   - Edit `.env` with your Firebase credentials:
+   - Edit `.env` with correct Firebase credentials, use of Amodeus API key, and Weather API: OpenWeather:
    ```
    REACT_APP_FIREBASE_API_KEY=your_api_key
    REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
@@ -50,3 +60,12 @@ for the airport, stick to using iata codes
    ```bash
    npm start
    ```
+
+
+
+
+## Development
+
+We used Firebase for authentication so that users can log in and change their password. As a result, they also can see only their specific trips and no one else's.
+
+In addition, we used the Amadeus Travel API to search for flights using IATA codes, and provide up-to-date flight information. OpenWeather was utilized for providing weather information on nearby flights, and we used React for developing the web app.
