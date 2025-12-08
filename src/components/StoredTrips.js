@@ -95,7 +95,7 @@ export default function StoredTrips() {
         for (const id of ids) {
           await tripService.deleteTrip(id);
         }
-        await loadTrips(); 
+        await loadTrips();
       } catch (error) {
         setError('Failed to delete trip: ' + error.message);
       }
@@ -137,85 +137,101 @@ export default function StoredTrips() {
     const usedIds = new Set();
     const displayFlights = [];
 
-    const normalizeCity = (val) => (val || '').toString().trim().toUpperCase();
+    const normalize = (val) => (val || '').toString().trim().toUpperCase();
 
     const getSearchGroupKey = (trip) => {
       const params = trip.searchParams || {};
-
       if (!params.returnDate) return null;
 
-      return [
-        normalizeCity(params.from || trip.flight?.departure?.airport),
-        normalizeCity(params.to || trip.flight?.arrival?.airport),
-        params.departDate || '',
-        params.returnDate || '',
-      ].join('|');
+      const from = normalize(params.from || trip.flight?.departure?.airport);
+      const to = normalize(params.to || trip.flight?.arrival?.airport);
+
+      return [from, to, params.departDate || '', params.returnDate || ''].join(
+        '|'
+      );
     };
 
     const getDirection = (trip) =>
       trip.flight?.searchType || trip.flight?.direction || '';
 
     const airportsMatchRoundTrip = (a, b) => {
-      const aDep = normalizeCity(a.flight?.departure?.airport);
-      const aArr = normalizeCity(a.flight?.arrival?.airport);
-      const bDep = normalizeCity(b.flight?.departure?.airport);
-      const bArr = normalizeCity(b.flight?.arrival?.airport);
+      const aDep = normalize(a.flight?.departure?.airport);
+      const aArr = normalize(a.flight?.arrival?.airport);
+      const bDep = normalize(b.flight?.departure?.airport);
+      const bArr = normalize(b.flight?.arrival?.airport);
 
       return aDep === bArr && aArr === bDep;
+    };
+
+    const directionsCompatible = (dirA, dirB) => {
+      if (!dirA || !dirB) return true;
+      return dirA !== dirB; // prefer outbound vs return
     };
 
     flightTrips.forEach((trip) => {
       if (usedIds.has(trip.id)) return;
 
-      const direction = getDirection(trip);
+      const dir = getDirection(trip);
       const groupKey = getSearchGroupKey(trip);
 
-      if (groupKey && direction === 'outbound') {
-        const match = flightTrips.find((other) => {
+      let match = null;
+
+      // Try to pair by search group key
+      if (groupKey) {
+        match = flightTrips.find((other) => {
           if (other.id === trip.id || usedIds.has(other.id)) return false;
 
           const otherDir = getDirection(other);
           const otherGroupKey = getSearchGroupKey(other);
 
-          // same search group + opposite direction
-          if (
-            otherDir === 'return' &&
-            otherGroupKey &&
-            otherGroupKey === groupKey
-          ) {
-            return true;
-          }
+          if (otherGroupKey !== groupKey) return false;
+          if (!directionsCompatible(dir, otherDir)) return false;
 
-          // Fallback rule airports look like a return leg
-          if (otherDir === 'return' && airportsMatchRoundTrip(trip, other)) {
-            return true;
-          }
-
-          return false;
+          return true;
         });
-
-        if (match) {
-          usedIds.add(trip.id);
-          usedIds.add(match.id);
-
-          displayFlights.push({
-            id: `${trip.id}__${match.id}`,
-            combinedIds: [trip.id, match.id],
-            type: 'flightRoundTrip', 
-            tripName: trip.tripName,
-            status: trip.status || match.status || 'saved',
-            createdAt: trip.createdAt || match.createdAt,
-            totalCost: (trip.totalCost || 0) + (match.totalCost || 0),
-            passengers: trip.passengers || match.passengers,
-            outboundTrip: trip,
-            returnTrip: match,
-          });
-
-          return; // done with this outbound
-        }
       }
 
-      // Fallback show as a normal single-leg flight
+      // Fallback pair purely by reversed airports
+      if (!match) {
+        match = flightTrips.find((other) => {
+          if (other.id === trip.id || usedIds.has(other.id)) return false;
+
+          const otherDir = getDirection(other);
+          if (!directionsCompatible(dir, otherDir)) return false;
+
+          return airportsMatchRoundTrip(trip, other);
+        });
+      }
+
+      if (match) {
+        usedIds.add(trip.id);
+        usedIds.add(match.id);
+
+        displayFlights.push({
+          id: `${trip.id}__${match.id}`,
+          combinedIds: [trip.id, match.id],
+          type: 'flightRoundTrip',
+          tripName: trip.tripName || match.tripName,
+          status: trip.status || match.status || 'saved',
+          createdAt: trip.createdAt || match.createdAt,
+          totalCost: (trip.totalCost || 0) + (match.totalCost || 0),
+          passengers: trip.passengers || match.passengers,
+          outboundTrip:
+            getDirection(trip) === 'return' &&
+            getDirection(match) === 'outbound'
+              ? match
+              : trip,
+          returnTrip:
+            getDirection(trip) === 'return' &&
+            getDirection(match) === 'outbound'
+              ? trip
+              : match,
+        });
+
+        return;
+      }
+
+      // No pair found → treat as a normal single-leg flight
       usedIds.add(trip.id);
       displayFlights.push(trip);
     });
@@ -452,7 +468,7 @@ function TripCard({
   onTripUpdated,
   onOpenAddToVacationModal,
 }) {
-  const [activeLeg, setActiveLeg] = useState('outbound'); 
+  const [activeLeg, setActiveLeg] = useState('outbound');
 
   const isRoundTripFlight = trip.type === 'flightRoundTrip';
 
@@ -760,7 +776,7 @@ function FlightTripContent({ trip, formatDate }) {
   );
 }
 
-// This is for round trip flights 
+// This is for round trip flights
 function RoundTripFlightContent({
   outboundTrip,
   returnTrip,
