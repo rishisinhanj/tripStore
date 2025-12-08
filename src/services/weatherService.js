@@ -20,6 +20,33 @@ async function fetchJson(url) {
   return res.json();
 }
 
+function normalizeCityName(rawName) {
+  if (!rawName) return rawName;
+
+  const trimmed = rawName.trim();
+  const upper = trimmed.toUpperCase();
+
+  const map = {
+    NYC: 'New York, US',
+    JFK: 'New York, US',
+    LGA: 'New York, US',
+    EWR: 'Newark, US',
+
+    CHI: 'Chicago, US',
+    LAX: 'Los Angeles, US',
+    SFO: 'San Francisco, US',
+    LON: 'London, GB',
+    PAR: 'Paris, FR',
+    TYO: 'Tokyo, JP',
+  };
+
+  if (map[upper]) {
+    return map[upper];
+  }
+
+  return trimmed;
+}
+
 async function getCityForecast(cityName) {
   if (!cityName) {
     throw new Error('Missing city name for weather lookup');
@@ -32,8 +59,11 @@ async function getCityForecast(cityName) {
     );
   }
 
+  const normalizedName = normalizeCityName(cityName);
+  console.log('Weather lookup city =', normalizedName);
+
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(
-    cityName
+    normalizedName
   )}&units=${UNITS}&appid=${API_KEY}`;
 
   const data = await fetchJson(url);

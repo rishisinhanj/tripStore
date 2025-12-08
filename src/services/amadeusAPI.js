@@ -375,7 +375,14 @@ class AmadeusAPI {
   }
 
   getLocationName(iataCode, dictionaries) {
-    return dictionaries?.locations?.[iataCode]?.cityCode || iataCode;
+    const loc = dictionaries?.locations?.[iataCode];
+    if (!loc) return iataCode;
+
+    if (loc.cityName && loc.countryCode) {
+      return `${loc.cityName}, ${loc.countryCode}`;
+    }
+
+    return loc.cityName || loc.cityCode || iataCode;
   }
 
   getTravelClass(classCode) {
